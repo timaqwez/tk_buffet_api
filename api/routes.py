@@ -1,5 +1,6 @@
 from fastapi import Request, APIRouter
 from playhouse.shortcuts import model_to_dict
+from starlette.responses import FileResponse
 
 from api.database import database
 from api.database.models import Category, Product, ProductCategories
@@ -8,7 +9,7 @@ router = APIRouter()
 
 
 @router.get('/all')
-async def get_all_info(request: Request):
+async def get_all_info():
     with database:
         products_names = [model_to_dict(product) for product in Product.select(
             Product.id,
@@ -28,7 +29,7 @@ async def get_all_info(request: Request):
 
 
 @router.get('/products/names')
-async def get_names(request: Request):
+async def get_names():
     with database:
         result = {'values': [model_to_dict(product) for product in Product.select(
             Product.id,
@@ -41,14 +42,14 @@ async def get_names(request: Request):
 
 
 @router.get('/products/all')
-async def get_all(request: Request):
+async def get_all():
     with database:
         result = {'values': [model_to_dict(product) for product in Product.select()]}
         return result
 
 
 @router.get('/products/{category_id}')
-async def get_products_ids_by_category(request: Request, category_id: int):
+async def get_products_ids_by_category(category_id: int):
     with database:
         products_ids = ProductCategories.select(ProductCategories.product).where(
             ProductCategories.category == category_id)
@@ -57,7 +58,12 @@ async def get_products_ids_by_category(request: Request, category_id: int):
 
 
 @router.get('/categories')
-async def get_categories(request: Request):
+async def get_categories():
     with database:
         result = {'values': [model_to_dict(category) for category in Category.select()]}
         return result
+
+
+@router.get("/images/{image_name}")
+async def main(image_name: str):
+    return FileResponse(f'assets/images/{image_name}')
