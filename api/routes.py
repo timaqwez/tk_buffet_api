@@ -65,5 +65,5 @@ async def get_categories():
 
 
 @router.get("/images/{image_name}")
-async def main(image_name: str):
+async def get_image(image_name: str):
     return FileResponse(path=f'assets/images/{image_name}')
